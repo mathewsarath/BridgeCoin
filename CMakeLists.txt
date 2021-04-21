@@ -50,10 +50,12 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 
   # Needed for the BLS dependency, which links an MT library
-  if (CMAKE_BUILD_TYPE MATCHES Debug)
+  if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MTd")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MTd")
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MT")
   endif()
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -65,6 +67,8 @@ set(CONAN_EXTRA_OPTIONS "")
 
 include(cmake/Conan.cmake)
 run_conan()
+
+include(cmake/ProjectSecp256k1.cmake)
 
 if(ENABLE_TESTING)
   enable_testing()
