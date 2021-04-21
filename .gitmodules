@@ -1,0 +1,4 @@
+[submodule "bls"]
+	path = bls
+	url = https://github.com/wezrule/bls
+	branch = 1.17
