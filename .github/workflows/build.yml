@@ -1,0 +1,198 @@
+name: Build & Tests
+
+on: [push, pull_request]
+
+env:
+  # Conan cache environment variables
+  CONAN_SYSREQUIRES_MODE: enabled
+  CONAN_USER_HOME: "${{ github.workspace }}/conan-cache"
+  CONAN_USER_HOME_SHORT: "${{ github.workspace }}/conan-cache/short"
+
+jobs:
+  linux_x64:
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        config:
+                - {cc: gcc-10, cxx: g++-10, build_type: "Debug", coverage: 'yes', benchmark: 'no'}
+                - {cc: gcc-10, cxx: g++-10, build_type: "Release", coverage: 'no', benchmark: 'yes'}
+                - {cc: clang-11, cxx: clang++-11, build_type: "Debug", coverage: 'no', benchmark: 'no'}
+                - {cc: clang-11, cxx: clang++-11, build_type: "Release", coverage: 'no', benchmark: 'no'}
+
+      fail-fast: false # This makes it so that if 1 of the tests fail in the matrix fail, they don't all fail
+    steps:
+    - uses: actions/checkout@v2.3.1
+      with:
+             submodules: recursive
+
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-conan-modules
+      with:
+        path: |
+          ${{ env.CONAN_USER_HOME }}
+          ~/.cache/pip
+        key: ${{ runner.os }}-${{ env.BUILD_TYPE }}-${{ hashFiles('CMakeLists.txt') }}-${{ hashFiles('cmake/Conan.cmake') }}
+
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+
+    - name: Install conan
+      shell: bash
+      run: |
+        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install conan
+        source ~/.profile
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      # 
+      # We need to source the profile file to make sure conan is in PATH
+      env:
+              CC: ${{ matrix.config.cc}}
+              CXX: ${{ matrix.config.cxx}}
+      run: |
+        source ~/.profile
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config ${{ matrix.config.build_type }} -- -j2
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{ matrix.config.build_type }} --output-on-failure
+
+
+  osx_test:
+    runs-on: macOS-latest
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    strategy:
+      matrix:
+        config:
+                - {build_type: "Debug"}
+    steps:
+    - uses: actions/checkout@v2.3.1
+      with:
+             submodules: recursive
+
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Install conan
+      shell: bash
+      run: |
+        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install conan
+        source ~/.bash_profile
+
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      env:
+              CC: clang
+              CXX: clang++
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      # 
+      # We need to source the profile file to make sure conan is in PATH
+      run: |
+        source ~/.bash_profile
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config ${{ matrix.config.build_type }} -- -j2
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{ matrix.config.build_type }} --output-on-failure
+
+  windows_test:
+    runs-on: windows-latest
+    # Needed for the build test on Windows as first one fails
+    strategy:
+      matrix:
+        config:
+               - {build_type: "Release"}
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+    - uses: actions/checkout@v2.3.1
+      with:
+             submodules: recursive
+ 
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Install conan
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip setuptools
+        python -m pip install conan
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      # 
+      # We need to source the profile file to make sure conan is in PATH
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+
+    - name: FailBuild
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      continue-on-error: true
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      # Building twice due to "mcl.lib" error the first iteration. Probably dependency ordering related.
+      run: cmake --build . --config ${{ matrix.config.build_type }}
+
+    - name: Rebuild
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      # Building twice due to "mcl.lib" error the first iteration. Probably dependency ordering related.
+      run: cmake --build . --config ${{ matrix.config.build_type }}
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{ matrix.config.build_type }} --output-on-failure

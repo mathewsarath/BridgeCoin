@@ -1,24 +1,13 @@
-# Prerequisites
-*.d
-
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
 
-# Precompiled Headers
-*.gch
-*.pch
-
 # Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -26,7 +15,51 @@
 *.a
 *.lib
 
+# Doxygen built HTML
+/doc-build
+
 # Executables
 *.exe
 *.out
 *.app
+*.dmg
+*.DS_Store
+
+# IDEs
+.idea
+.vscode
+*.plist
+
+# Visual Studio
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.qrc.depends
+*.dir
+Debug
+Release
+.vs
+*.aps
+*.db
+*.opendb
+
+# CMake artifacts
+_CPack_Packages
+CPack*
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+compile_commands.json
+CTestTestfile.cmake
+install_manifest.txt
+Makefile
+Testing
+
+# Vim files
+*~
+*.swp
+
+# Build directory
+build/*
