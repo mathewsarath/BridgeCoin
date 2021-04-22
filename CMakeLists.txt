@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Debug1 CACHE STRING "")
+
 # Needed to get conan to use the correct vs runtime
 if(MSVC)
   cmake_policy(SET CMP0091 NEW)
 endif()
 
 project(bridge_coin)
+
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE STRING "")
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE STRING "")
 
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
@@ -69,6 +75,7 @@ include(cmake/Conan.cmake)
 run_conan()
 
 include(cmake/ProjectSecp256k1.cmake)
+
 
 if(ENABLE_TESTING)
   enable_testing()
