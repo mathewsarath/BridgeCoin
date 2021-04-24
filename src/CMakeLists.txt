@@ -1,3 +1,6 @@
+add_subdirectory(algorithms)
+add_subdirectory(signing)
+
 add_executable(node main.cpp)
 target_link_libraries(
   node
@@ -5,7 +8,6 @@ target_link_libraries(
           project_warnings
           CONAN_PKG::fmt
           CONAN_PKG::spdlog
-          bls::bls384_256
+          signing
+          algorithms
           Secp256k1)
-
-target_compile_definitions(node PRIVATE BLS_DONT_EXPORT)

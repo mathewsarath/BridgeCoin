@@ -123,18 +123,18 @@ jobs:
         source ~/.bash_profile
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
 
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
+#    - name: Build
+#      working-directory: ${{runner.workspace}}/build
+#      shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config ${{ matrix.config.build_type }} -- -j2
+#      run: cmake --build . --config ${{ matrix.config.build_type }} -- -j2
 
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
+#    - name: Test
+#      working-directory: ${{runner.workspace}}/build
+#      shell: bash
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{ matrix.config.build_type }} --output-on-failure
+#      run: ctest -C ${{ matrix.config.build_type }} --output-on-failure
 
   windows_test:
     runs-on: windows-latest
