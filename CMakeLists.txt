@@ -6,6 +6,8 @@ if(MSVC)
 endif()
 
 project(bridge_coin)
+set(PROJECT_NAME "BridgeCoin" CACHE STRING "" FORCE)
+add_compile_definitions(PROJECT_NAME="${LONG_PROJECT_NAME}") 
 
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)

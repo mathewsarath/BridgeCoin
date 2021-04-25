@@ -1,10 +1,11 @@
-add_executable(tests tests.cpp signing.cpp)
+add_executable(tests tests.cpp config.cpp signing.cpp)
 target_link_libraries(
   tests
   PRIVATE project_warnings
           project_options
           signing
           algorithms
+          config
           bls::bls384_256
           CONAN_PKG::gtest)
 
