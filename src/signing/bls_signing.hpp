@@ -1,5 +1,6 @@
 #pragma once
 
+#include "algorithms/concepts.hpp"
 #include "signing.hpp"
 
 #include <bls/bls384_256.h>
@@ -54,12 +55,6 @@ auto MultiSigSharedKeyGenerator(
 	}
 	return keys;
 }
-
-template <typename T>
-concept HasDataSize = requires(T t) {
-	t.data();
-	t.size();
-};
 
 template <typename T>
 requires HasDataSize<T>&& std::is_standard_layout_v<T> Signature<SigType::bls> AggregateSignatures(T const& signatures) {

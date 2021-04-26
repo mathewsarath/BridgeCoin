@@ -26,6 +26,7 @@ macro(run_conan)
     boost/1.75.0
     docopt.cpp/0.6.2
     spdlog/1.5.0
+    libb2/20190723
     OPTIONS
     ${CONAN_EXTRA_OPTIONS}
     BASIC_SETUP
