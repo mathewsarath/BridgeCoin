@@ -33,9 +33,11 @@ The following compilers should work:
 	<summary>Install command</summary>
 
 	- Debian/Ubuntu:
+
 			sudo apt install build-essential
 
-	- MacOS:		
+	- MacOS:
+			
 			brew install gcc
 	</details>
 
