@@ -1,5 +1,6 @@
 add_subdirectory(algorithms)
 add_subdirectory(config)
+add_subdirectory(debugging)
 add_subdirectory(signing)
 
 add_executable(node main.cpp)

@@ -6,6 +6,7 @@ target_link_libraries(
           signing
           algorithms
           config
+          debugging
           bls::bls384_256
           CONAN_PKG::gtest)
 
