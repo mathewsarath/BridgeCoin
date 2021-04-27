@@ -20,7 +20,7 @@ public:
 
 	template <typename T>
 	void Update(const T& buf) requires std::integral<T> {
-		blake2b_update(&hasher, reinterpret_cast<uint8_t*>(buf), sizeof(buf));
+		blake2b_update(&hasher, reinterpret_cast<const void*>(&buf), sizeof(buf));
 	}
 
 	std::array<uint8_t, DigestSize> Output() {

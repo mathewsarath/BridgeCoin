@@ -27,7 +27,9 @@ macro(run_conan)
     docopt.cpp/0.6.2
     spdlog/1.5.0
     libb2/20190723
+    rocksdb/6.10.2
     OPTIONS
+    rocksdb:use_rtti=True
     ${CONAN_EXTRA_OPTIONS}
     BASIC_SETUP
     CMAKE_TARGETS # individual targets to link to
